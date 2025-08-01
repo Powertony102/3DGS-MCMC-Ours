@@ -51,9 +51,9 @@ all_scenes.extend(tanks_and_temples_scenes)
 all_scenes.extend(deep_blending_scenes)
 
 if not args.skip_training or not args.skip_rendering:
-    parser.add_argument('--mipnerf360', "-m360", required=True, type=str)
-    parser.add_argument("--tanksandtemples", "-tat", required=True, type=str)
-    parser.add_argument("--deepblending", "-db", required=True, type=str)
+    parser.add_argument('--mipnerf360', "-m360", default="/home/jovyan/work/gs_compression/HAC-main/data/mipnerf360", type=str)
+    parser.add_argument("--tanksandtemples", "-tat", default="/home/jovyan/shared/xinzeli/tandt_db/tandt", type=str)
+    parser.add_argument("--deepblending", "-db", default="/home/jovyan/shared/xinzeli/tandt_db/db", type=str)
     args = parser.parse_args()
 
 if not args.skip_training:
