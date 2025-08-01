@@ -17,6 +17,23 @@ mipnerf360_indoor_scenes = ["room", "counter", "kitchen", "bonsai"]
 tanks_and_temples_scenes = ["truck", "train"]
 deep_blending_scenes = ["drjohnson", "playroom"]
 
+# Maximum number of Gaussians for each scene
+MAX_N_GAUSSIAN = {
+    "bicycle": 5033049, 
+    "garden": 4184336, 
+    "stump": 4303916, 
+    "flowers": 2950914, 
+    "treehill": 3310948, 
+    "room": 1346463, 
+    "kitchen": 1634800, 
+    "counter": 1105841, 
+    "bonsai": 1095842, 
+    "drjohnson": 3231872, 
+    "playroom": 1913528, 
+    "train": 1108608, 
+    "truck": 2101586, 
+}
+
 parser = ArgumentParser(description="Full evaluation script parameters")
 parser.add_argument("--skip_training", action="store_true")
 parser.add_argument("--skip_rendering", action="store_true")
@@ -52,16 +69,20 @@ if not args.skip_training:
     common_args = " --quiet --eval --test_iterations -1 " + wandb_args
     for scene in mipnerf360_outdoor_scenes:
         source = args.mipnerf360 + "/" + scene
-        os.system("python train.py -s " + source + " -i images_4 -m " + args.output_path + "/" + scene + common_args)
+        cap_max = MAX_N_GAUSSIAN.get(scene, 1000000)  # Default fallback
+        os.system("python train.py -s " + source + " -i images_4 -m " + args.output_path + "/" + scene + common_args + f" --cap_max {cap_max}")
     for scene in mipnerf360_indoor_scenes:
         source = args.mipnerf360 + "/" + scene
-        os.system("python train.py -s " + source + " -i images_2 -m " + args.output_path + "/" + scene + common_args)
+        cap_max = MAX_N_GAUSSIAN.get(scene, 1000000)  # Default fallback
+        os.system("python train.py -s " + source + " -i images_2 -m " + args.output_path + "/" + scene + common_args + f" --cap_max {cap_max}")
     for scene in tanks_and_temples_scenes:
         source = args.tanksandtemples + "/" + scene
-        os.system("python train.py -s " + source + " -m " + args.output_path + "/" + scene + common_args)
+        cap_max = MAX_N_GAUSSIAN.get(scene, 1000000)  # Default fallback
+        os.system("python train.py -s " + source + " -m " + args.output_path + "/" + scene + common_args + f" --cap_max {cap_max}")
     for scene in deep_blending_scenes:
         source = args.deepblending + "/" + scene
-        os.system("python train.py -s " + source + " -m " + args.output_path + "/" + scene + common_args)
+        cap_max = MAX_N_GAUSSIAN.get(scene, 1000000)  # Default fallback
+        os.system("python train.py -s " + source + " -m " + args.output_path + "/" + scene + common_args + f" --cap_max {cap_max}")
 
 if not args.skip_rendering:
     all_sources = []
