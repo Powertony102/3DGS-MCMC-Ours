@@ -215,11 +215,22 @@ int CudaRasterizer::Rasterizer::forward(
 	const float* cam_pos,
 	const float tan_fovx, float tan_fovy,
 	const bool prefiltered,
+  float* kernel_times,
 	float* out_color,
 	int* is_used,
 	int* radii,
 	bool debug)
 {
+  // Timers for functions
+  cudaEvent_t overallStart, overallStop;
+  cudaEventCreate(&overallStart);
+  cudaEventCreate(&overallStop);
+  float milliseconds;
+
+	int num_rendered;
+  // Record Overall forward time
+  cudaEventRecord(overallStart, 0);
+
 	const float focal_y = height / (2.0f * tan_fovy);
 	const float focal_x = width / (2.0f * tan_fovx);
 
@@ -333,6 +344,15 @@ int CudaRasterizer::Rasterizer::forward(
 		background,
 		out_color,
 		is_used), debug)
+
+  // End Overall timer
+  cudaEventRecord(overallStop, 0);
+  cudaEventSynchronize(overallStop);
+  cudaEventElapsedTime(&milliseconds, overallStart, overallStop);
+  kernel_times[0] = milliseconds;
+
+  cudaEventDestroy(overallStart);
+  cudaEventDestroy(overallStop);
 
 	return num_rendered;
 }

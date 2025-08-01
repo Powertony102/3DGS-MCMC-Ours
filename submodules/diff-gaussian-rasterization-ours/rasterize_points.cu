@@ -66,6 +66,8 @@ RasterizeGaussiansCUDA(
   auto int_opts = means3D.options().dtype(torch::kInt32);
   auto float_opts = means3D.options().dtype(torch::kFloat32);
 
+  // Timer code is generated on CPU, so just keep kernel_times on CPU
+  torch::Tensor kernel_times = torch::full({1}, 0.0, float_opts.device(torch::kCPU));
   torch::Tensor out_color = torch::full({NUM_CHANNELS, H, W}, 0.0, float_opts);
   torch::Tensor radii = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
   torch::Tensor is_used = torch::full({P}, 0, means3D.options().dtype(torch::kInt32));
@@ -109,12 +111,13 @@ RasterizeGaussiansCUDA(
 		tan_fovx,
 		tan_fovy,
 		prefiltered,
+		kernel_times.contiguous().data<float>(),
 		out_color.contiguous().data<float>(),
 		is_used.contiguous().data<int>(),
 		radii.contiguous().data<int>(),
 		debug);
   }
-  return std::make_tuple(rendered, out_color, radii, geomBuffer, binningBuffer, imgBuffer, is_used);
+  return std::make_tuple(rendered, out_color, radii, kernel_times, geomBuffer, binningBuffer, imgBuffer, is_used);
 }
 
 std::tuple<torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor, torch::Tensor>
