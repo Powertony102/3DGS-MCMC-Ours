@@ -74,8 +74,8 @@ __global__ void duplicateWithKeys(
 	const uint32_t* offsets,
 	uint64_t* gaussian_keys_unsorted,
 	uint32_t* gaussian_values_unsorted,
-	int* radii,
 	const float4* conic_opacity,
+	uint32_t* tiles_touched,
 	dim3 grid)
 {
 	auto idx = cg::this_grid().thread_rank();
@@ -83,7 +83,7 @@ __global__ void duplicateWithKeys(
 		return;
 
 	// Generate no key/value pair for invisible Gaussians
-	if (radii[idx] > 0)
+	if (tiles_touched[idx] > 0)
 	{
 		// Find this Gaussian's offset in buffer for writing keys/values.
 		uint32_t off = (idx == 0) ? 0 : offsets[idx - 1];
@@ -294,8 +294,8 @@ int CudaRasterizer::Rasterizer::forward(
 		geomState.point_offsets,
 		binningState.point_list_keys_unsorted,
 		binningState.point_list_unsorted,
-		radii,
 		geomState.conic_opacity,
+		geomState.tiles_touched,
 		tile_grid)
 	CHECK_CUDA(, debug)
 
