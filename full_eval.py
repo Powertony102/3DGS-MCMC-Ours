@@ -67,6 +67,7 @@ if not args.skip_training:
         wandb_args += " --disable_wandb"
     
     common_args = " --quiet --eval --test_iterations -1 " + wandb_args
+    """
     for scene in mipnerf360_outdoor_scenes:
         source = args.mipnerf360 + "/" + scene
         cap_max = MAX_N_GAUSSIAN.get(scene, 1000000)  # Default fallback
@@ -79,6 +80,7 @@ if not args.skip_training:
         source = args.tanksandtemples + "/" + scene
         cap_max = MAX_N_GAUSSIAN.get(scene, 1000000)  # Default fallback
         os.system("python train.py -s " + source + " -m " + args.output_path + "/" + scene + common_args + f" --cap_max {cap_max}")
+    """
     for scene in deep_blending_scenes:
         source = args.deepblending + "/" + scene
         cap_max = MAX_N_GAUSSIAN.get(scene, 1000000)  # Default fallback
@@ -86,12 +88,14 @@ if not args.skip_training:
 
 if not args.skip_rendering:
     all_sources = []
+    """
     for scene in mipnerf360_outdoor_scenes:
         all_sources.append(args.mipnerf360 + "/" + scene)
     for scene in mipnerf360_indoor_scenes:
         all_sources.append(args.mipnerf360 + "/" + scene)
     for scene in tanks_and_temples_scenes:
         all_sources.append(args.tanksandtemples + "/" + scene)
+    """
     for scene in deep_blending_scenes:
         all_sources.append(args.deepblending + "/" + scene)
 
